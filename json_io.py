@@ -4,7 +4,9 @@ import sys
 import os
 
 from flask import Flask, render_template, request, redirect, url_for, Response
+from geopy.geocoders import Nominatim
 import random, json
+import datetime
 
 app = Flask(__name__)
 
@@ -21,15 +23,18 @@ def output():
 def postRestaurant():
 	if request.method == 'POST':
 		name = request.form['name']
-		date = request.form['date']
-		rating = request.form['name']
+		now = datetime.datetime.now()
+		date = unicode(now.replace(microsecond=0))
 		comments = request.form['comments']
 		data1 = {"name": name, "date": date, "rating": 4, "comments": comments}
 		id = request.args.get("id")
 		writeToJSONFile(path, fileName, writeReview(readFromJSONFile(path, fileName), data1, id))
-		return render_template('index.html')
-	else:
 		return render_template('restaurant.html')
+	else:
+		id = request.args.get("id")
+		rtg = ratingRestourant(readFromJSONFile(path, fileName), id)
+		writeToJSONFile(path, 'example', rtg)
+		return render_template('restaurant.html', rtg = rtg)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def newRestourant():
@@ -37,9 +42,15 @@ def newRestourant():
 		if "new_restaurant" in request.form:
 			restaurant_name = request.form['restaurant_name']
 			address = request.form['adress']
+			geolocator = Nominatim(user_agent="json_io.py")
+			location = geolocator.geocode(address, timeout=None)
 			boro = request.form['boro']
-			lat = request.form['lat']
-			lng = request.form['lng']
+			if location is None:
+				lat = 40.722216
+				lng = -73.722216
+			else:
+				lat = location.latitude
+				lng = location.longitude
 			cuisine = request.form['cuisine']
 			operating_hours = {"Monday": request.form['mon'], "Tuesday": request.form['tue'], "Wednesday": request.form['wed'], "Thursday": request.form['thu'], "Friday": request.form['fri'], "Saturday": request.form['sat'], "Sunday": request.form['sun']}
 			file = request.files['image']
@@ -76,10 +87,26 @@ def readFromJSONFile(path, fileName):
 		return json_load
 
 def deleteRestaurant(json_del, delete_name):
+	id_num = 1
 	for i in json_del['restaurants']:
 		if i['name'] == delete_name:
 			json_del['restaurants'].remove(i)
+			for j in json_del['restaurants']:
+				j['id'] = id_num
+				id_num = id_num + 1
 			return json_del
+
+def ratingRestourant(json_rate, id):
+	average = 0
+	for i in json_rate['restaurants']:
+		if str(i['id']) == id and i['reviews']:
+			for j in i['reviews']:
+				average = average + j['rating']
+			average = float(average)/len(i['reviews'])
+			return round(average,1)
+	return 0
+
+
 
 def writeReview(json_rv, data, id):
 	for i in json_rv['restaurants']:

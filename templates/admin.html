@@ -15,7 +15,12 @@
     </nav>
   </header>
 
-  <section>
+  <ul id="breadcrumb" style="width:100%;">
+    <li><a href="/?user=admin">Home</a></li>
+    <li>Admin Page</li>
+  </ul>
+    <section id='create-restaurant'>
+    <h2>Add New Restaurant</h2>
     <form action="#" method = 'post' enctype = 'multipart/form-data'>
     <p>Name:</p>
       <input type ='text' size='30' name='restaurant_name'>
@@ -38,26 +43,26 @@
       <input type ='text'  name='fri' value ='8:00 am - Sat'>Friday</br>
       <input type ='text' name='sat' value ='Open 24 hours'>Saturday</br>
       <input type ='text'  name='sun' value ='Sat - 10:30 pm'>Sunday</br>
-    <p>Latitude and Longitude</p>
+    <!--
+     <p>Latitude and Longitude</p>
       <input type ='number'  name='lat' step="any" value = 40.722216 >Lat</br>
       <input type ='number'  name='lng' step="any" value = -73.722216 >Lat</br>
+    -->
     <p>Specify a image file</p>
     <input type='file' name='image'  id='file'>
     </br>
-  <input type='submit' value='Create' name='new_restaurant'>
+  <input type='submit' value='Create' name='new_restaurant' id='new'>
 </form>
 </section>
-</br>
-</br>
-</br>
-<section>
+<section id='create-restaurant'>
+  <h2>Delete Restaurant</h2>
   <form action="#" method = 'post' enctype = 'multipart/form-data'>
 
     <select id="names-select" name="names">
       <option value="all">All Restaurant</option>
     </select>
 </br>
-<input type='submit' value='Delete' name='delete_restaurant'>
+<input type='submit' value='Delete' name='delete_restaurant' id="del">
 </form>
 </section>
 

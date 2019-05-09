@@ -7,7 +7,6 @@ var newMap;
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap();
 });
-
 /**
  * Initialize leaflet map
  */
@@ -98,6 +97,11 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
+  if (getParameterByName('user') == 'user') {
+    fillCreateReviewHTML();
+  }
+  fillStars();
+  fillRate();
   fillReviewsHTML();
 }
 
@@ -119,6 +123,86 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 
     hours.appendChild(row);
   }
+}
+
+fillStars = () => {
+  const rtg = $('#my-data').data()
+  if (rtg.rate > 0) {
+    const stars = document.getElementById("stars");
+    stars.innerHTML = getStars(rtg.rate);
+  }
+}
+
+fillRate = () => {
+  const rtg = $('#my-data').data()
+  if (rtg.rate > 0) {
+    const trate = document.getElementById("rate");
+    trate.innerHTML = rtg.rate + ' out of 5 stars';
+  }
+}
+
+getStars = (rating) => {
+
+  // Round to nearest half
+  const rate = Math.round(rating * 2) / 2;
+  let output = [];
+
+  // Append all the filled whole stars
+  for (var i = rate; i >= 1; i--)
+    output.push('<i class="fa fa-star" aria-hidden="true" style="color: gold;"></i>&nbsp;');
+
+  // If there is a half a star, append it
+  if (i == .5) output.push('<i class="fa fa-star-half-o" aria-hidden="true" style="color: gold;"></i>&nbsp;');
+
+  // Fill the empty stars
+  for (let i = (5 - rate); i >= 1; i--)
+    output.push('<i class="fa fa-star-o" aria-hidden="true" style="color: gold;"></i>&nbsp;');
+
+  return output.join('');
+
+}
+
+fillCreateReviewHTML = () => {
+  const container = document.getElementById('form-container');
+  const title = document.createElement('h2');
+  title.innerHTML = 'Create Review';
+  container.appendChild(title);
+
+  const f = document.createElement("form");
+  f.setAttribute('method',"post");
+  f.setAttribute('action',"");
+
+  const label1 = document.createElement('p');
+  label1.innerHTML = 'Name:';
+
+  const i = document.createElement("input");
+  i.setAttribute('type',"text");
+  i.setAttribute('size',"30");
+  i.setAttribute('name',"name");
+
+  const label2 = document.createElement('p');
+  label2.innerHTML = 'Comments:';
+
+  const txtbox = document.createElement('textarea');
+  txtbox.setAttribute('name', "comments");
+  txtbox.setAttribute('rows', "20");
+  txtbox.setAttribute('cols', "50");
+
+  const br = document.createElement('p');
+
+  const s = document.createElement("input");
+  s.setAttribute('type',"submit");
+  s.setAttribute('value',"Create");
+  s.setAttribute('id',"review");
+
+  f.appendChild(label1);
+  f.appendChild(i);
+  f.appendChild(label2);
+  f.appendChild(txtbox);
+  f.appendChild(br);
+  f.appendChild(s);
+
+  container.appendChild(f);
 }
 
 /**

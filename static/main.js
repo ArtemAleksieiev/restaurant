@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
   initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
+  if (getParameterByName('user') == 'admin') {
+    fillAdminHTML();
+  }
+  if (getParameterByName('user') == 'admin' || getParameterByName('user') == 'user') {
+    fillLogoutHTML();
+  }
 });
 
 /**
@@ -175,9 +181,13 @@ createRestaurantHTML = (restaurant) => {
 
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
-  more.href = DBHelper.urlForRestaurant(restaurant);
-  li.append(more)
-
+  var url = DBHelper.urlForRestaurant(restaurant);
+  if (getParameterByName('user') == 'user') {
+    var param = '&user=user';
+    url = url + param;
+  }
+  more.href = url;
+  li.append(more);
   return li
 }
 
@@ -195,6 +205,34 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 
+}
+
+fillAdminHTML = () => {
+  const admin = document.getElementById('admin');
+  admin.innerHTML = 'Admin';
+}
+
+fillLogoutHTML = () => {
+  const login = document.getElementById('login');
+  const logout = document.createElement('a');
+  logout.setAttribute('href',"/");
+  logout.setAttribute('class',"button");
+  logout.innerHTML = 'Logout'
+  login.innerHTML = '';
+  login.appendChild(logout);
+}
+
+getParameterByName = (name, url) => {
+  if (!url)
+    url = window.location.href;
+  name = name.replace(/[\[\]]/g, '\\$&');
+  const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`),
+    results = regex.exec(url);
+  if (!results)
+    return null;
+  if (!results[2])
+    return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 /* addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
